@@ -1,0 +1,75 @@
+# Workflow name
+name: Frontend Continuous Integration
+
+# Triggers for the workflow
+on:
+  # Manual trigger using the workflow_dispatch event
+  workflow_dispatch:
+
+  # Automatic trigger on pull request events targeting the main branch
+  pull_request:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: ./starter/frontend
+
+# Jobs defined in the workflow
+jobs:
+  lint-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+
+      - name: Install Dependencies 
+        run : npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+
+      - name: Install Dependencies 
+        run : npm ci
+
+      - name: Run tests
+        run:  CI=true npm test
+
+  build-job:
+    needs: [lint-job, test-job]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+
+      - name: Install Dependencies 
+        run : npm ci 
+
+      - name: Build Docker Image via CLI
+          env:
+            IMAGE_TAG: ${{ github.sha }}
+            REACT_APP_MOVIE_API_URL: http://localhost:5000
+          run:  docker build --build-arg REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL -t --tag=mp-frontend:latest .
+          

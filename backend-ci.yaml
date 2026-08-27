@@ -1,0 +1,49 @@
+# Workflow name
+name: Backend Continuous Integration
+
+# Triggers for the workflow
+on:
+  # Manual trigger using the workflow_dispatch event
+  workflow_dispatch:
+
+  # Automatic trigger on pull request events targeting the main branch
+  pull_request:
+    branches:
+      - main
+
+# Jobs defined in the workflow
+jobs:
+  lint-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+
+      - name: Run Linter
+        run: 
+        working-directory: /workspace/starter/backend
+        pipeenv run lint
+
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Dependencies
+        working-directory: /workspace/starter/backend
+        run: pipenv install
+
+      - name: Run tests
+        working-directory: /workspace/starter/backend
+        run: pipenv run test
+
+
+  build-job:
+    needs: [lint-job, test-job]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Docker Image via CLI
+        run: docker build -t mp-backend:ci:${{ github.sha }} /workspace/starter/backend

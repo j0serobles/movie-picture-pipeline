@@ -1,0 +1,104 @@
+# Workflow name
+name: Backend Continuous Deployment
+
+# Triggers for the workflow
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'starter/backend/**'
+      - '.github/workflows/backend-cd.yaml'
+  workflow_dispatch:
+
+
+env:
+  AWS_REGION: us-east-1                    # Replace with your AWS Region
+  EKS_CLUSTER_NAME: my-eks-cluster         # Replace with your EKS cluster name
+  ECR_REGISTRY: 419656091143.dkr.ecr.us-east-1.amazonaws.com  # ECR Registry name
+  ECR_REPOSITORY: movie-picture-pipeline   # Replace with your Amazon ECR repo name
+
+# Jobs defined in the workflow
+
+jobs:
+  lint-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        working-directory: ./starter/backend
+        run: pipenv install
+
+      - name: Run Linter
+        run: 
+        working-directory: ./starter/backend
+        pipeenv run lint
+
+  test-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        working-directory: ./starter/backend
+        run: pipenv install
+
+      - name: Run tests
+        working-directory: ./starter/backend
+        run: pipenv run test
+
+  build-deploy-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ vars.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to AWS ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+       
+      - name: Build and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+
+       # Installs Kustomize and adds it to $PATH
+      - name: Setup Kustomize
+        uses: syntaqx/setup-kustomize@v1
+        with:
+          kustomize-version: 'latest'
+
+       # Verify kustomize installation and set the image tag.
+      - name: Run Kustomize
+        run: |
+          kustomize version
+          kustomize edit set image backend=${IMAGE_URI}
+        working-directory: ./starter/backend/k8s
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+
+      - name: Deploy to Kubernetes
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          kubectl version --client
+          kubectl apply -f deployment.yml --kubeconfig=kubeconfig.yaml
+        working-directory: ./starter/backend/k8s
