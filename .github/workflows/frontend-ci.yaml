@@ -68,8 +68,8 @@ jobs:
         run : npm ci 
 
       - name: Build Docker Image via CLI
-          env:
-            IMAGE_TAG: ${{ github.sha }}
-            REACT_APP_MOVIE_API_URL: http://localhost:5000
-          run:  docker build --build-arg REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL -t --tag=mp-frontend:latest .
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          REACT_APP_MOVIE_API_URL: http://localhost:5000
+        run:  docker build --build-arg REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL -t --tag=mp-frontend:latest .
           
