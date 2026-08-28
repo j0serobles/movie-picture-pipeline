@@ -93,8 +93,8 @@ jobs:
        # Installs Kustomize and adds it to $PATH
       - name: Setup Kustomize
         uses: syntaqx/setup-kustomize@v1
-        with:
-          kustomize-version: 'latest'
+        #with:
+          #kustomize-version: 'latest'
 
        # Verify kustomize installation and set the image tag.
       - name: Run Kustomize
