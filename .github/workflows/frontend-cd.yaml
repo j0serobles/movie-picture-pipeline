@@ -113,5 +113,5 @@ jobs:
           pwd
           ls -al
           kubectl version --client
-          kubectl apply -f deployment.yml --kubeconfig=kubeconfig.yaml
+          kubectl apply -f deployment.yaml --kubeconfig=kubeconfig.yaml
         working-directory: ./starter/frontend/k8s
