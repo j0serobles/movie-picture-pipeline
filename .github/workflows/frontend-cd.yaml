@@ -111,5 +111,5 @@ jobs:
         run: |
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
           kubectl version --client
-          kubectl apply -f deployment.yml --kubeconfig=kubeconfig.yaml
+          kubectl apply -f "$GITHUB_WORKSPACE/starter/frontend/k8s/deployment.yml" --kubeconfig=kubeconfig.yaml
         working-directory: ./starter/frontend/k8s
