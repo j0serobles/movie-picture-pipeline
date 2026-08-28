@@ -90,12 +90,10 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
 
-       # Installs Kustomize and adds it to $PATH
+       # Installs Kustomize and adds it to PATH
       - name: Setup Kustomize
         uses: syntaqx/setup-kustomize@v1
-        #with:
-          kustomize-version: 'latest'
-
+        
        # Verify kustomize installation and set the image tag.
       - name: Run Kustomize
         run: |
