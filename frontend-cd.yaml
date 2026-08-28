@@ -9,6 +9,7 @@ on:
     paths:
       - 'starter/frontend/**'
       - '.github/workflows/frontend-cd.yaml'
+      
   workflow_dispatch:
 
 defaults:

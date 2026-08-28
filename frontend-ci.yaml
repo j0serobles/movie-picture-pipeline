@@ -1,5 +1,5 @@
 # Workflow name
-name: Backend Continuous Integration
+name: Frontend Continuous Integration
 
 # Triggers for the workflow
 on:
@@ -10,10 +10,13 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'starter/frontend/**'
+      - '.github/workflows/frontend-ci.yaml'
 
 defaults:
   run:
-    working-directory: ./starter/backend
+    working-directory: ./starter/frontend
 
 # Jobs defined in the workflow
 jobs:
@@ -31,8 +34,8 @@ jobs:
       - name: Install Dependencies 
         run : npm ci
 
-      - name: Run Linter
-        run:  pipeenv run lint
+      - name: Run linter
+        run: npm run lint
 
   test-job:
     runs-on: ubuntu-latest
@@ -40,29 +43,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: pipenv install
+      - name: Set up Node.js 
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+
+      - name: Install Dependencies 
+        run : npm ci
 
       - name: Run tests
-        run: pipenv run test
+        run:  CI=true npm test
 
   build-job:
     needs: [lint-job, test-job]
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: pipenv install
+      - name: Set up Node.js 
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+
+      - name: Install Dependencies 
+        run : npm ci 
 
       - name: Build Docker Image via CLI
-        run: |
-          docker build -t mp-backend:ci:${{ github.sha }} .
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          REACT_APP_MOVIE_API_URL: http://localhost:5000
+        run:  |
+          docker build --build-arg REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL --tag=mp-frontend:latest .
           docker images
-          docker run -p 5000:5000 --name mp-backend:ci:${{ github.sha }} -d mp-backend:ci:${{ github.sha }}
-          curl http://localhost:5000/movies
-          docker logs -f mp-backend:ci:${{ github.sha }}
-          docker stop
-  
-
+          
