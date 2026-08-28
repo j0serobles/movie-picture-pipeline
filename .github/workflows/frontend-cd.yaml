@@ -109,10 +109,12 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          echo "${{ vars.KUBECONFIG }}" > kubeconfig.yaml
           pwd
           ls -al
+          echo "***** kubeconfig.yaml *****"
           cat kubeconfig.yaml
+          echo "***** deployment.yaml *****"
           cat deployment.yaml
           kubectl version --client
           kubectl apply -f deployment.yaml --kubeconfig=kubeconfig.yaml
