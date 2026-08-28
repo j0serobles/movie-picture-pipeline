@@ -11,13 +11,15 @@ on:
       - '.github/workflows/frontend-cd.yaml'
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory: ./starter/frontend
 
 env:
   AWS_REGION: us-east-1                    # Replace with your AWS Region
-  EKS_CLUSTER_NAME: my-eks-cluster         # Replace with your EKS cluster name
+  EKS_CLUSTER_NAME: cluster                # Replace with your EKS cluster name
   ECR_REGISTRY: 419656091143.dkr.ecr.us-east-1.amazonaws.com
   ECR_REPOSITORY: movie-picture-pipeline   # Replace with your Amazon ECR repo name
-
 
 # Jobs defined in the workflow
 
@@ -38,7 +40,6 @@ jobs:
 
       - name: Run linter
         run: npm run lint
-
 
   test-job:
     runs-on: ubuntu-latest
@@ -84,7 +85,6 @@ jobs:
           docker build --build-arg REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
-        working-directory: ./starter/frontend
 
        # Installs Kustomize and adds it to $PATH
       - name: Setup Kustomize
@@ -101,6 +101,7 @@ jobs:
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
+        id: install-kubectl
         with:
           version: 'latest'
 
