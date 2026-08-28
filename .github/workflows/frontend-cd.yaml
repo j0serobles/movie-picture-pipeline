@@ -98,7 +98,7 @@ jobs:
       - name: Run Kustomize
         run: |
           kustomize version
-          kustomize edit set image backend=${IMAGE_URI}
+          kustomize edit set image frontend=${IMAGE_URI}
           echo "***** deployment.yaml *****"
           cat ./deployment.yaml
           echo "***** service.yaml *****"
