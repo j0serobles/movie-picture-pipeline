@@ -99,6 +99,11 @@ jobs:
         run: |
           kustomize version
           kustomize edit set image backend=${IMAGE_URI}
+          echo "***** deployment.yaml *****"
+          cat ./deployment.yaml
+          echo "***** service.yaml *****"
+          cat ./service.yaml
+          echo "Image URI is " ${IMAGE_URI}
         working-directory: ./starter/frontend/k8s
 
       - name: Set up kubectl
