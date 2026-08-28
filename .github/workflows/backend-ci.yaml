@@ -63,7 +63,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8
-          
+
       - name: Run tests
         run: pipenv run test
 
@@ -92,9 +92,9 @@ jobs:
 
       - name: Build Docker Image via CLI
         run: |
-          docker build -t mp-backend:ci:${{ github.sha }} .
+          docker build -t mp-backend:latest .
           docker images
-          docker run -p 5000:5000 --name mp-backend:ci:${{ github.sha }} -d mp-backend:ci:${{ github.sha }}
+          docker run -p 5000:5000 --name mp-backend -d mp-backend
           curl http://localhost:5000/movies
-          docker logs -f mp-backend:ci:${{ github.sha }}
+          docker logs -f mp-backend
           docker stop
