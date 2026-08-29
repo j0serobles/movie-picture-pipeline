@@ -22,6 +22,12 @@ env:
   ECR_REGISTRY: 419656091143.dkr.ecr.us-east-1.amazonaws.com
   ECR_REPOSITORY: movie-picture-pipeline   # Replace with your Amazon ECR repo name
 
+permissions:
+  # This grants the job permission to generate the OIDC token.
+  id-token: write 
+  # This is good practice for checkout
+  contents: read
+
 # Jobs defined in the workflow
 
 jobs:
