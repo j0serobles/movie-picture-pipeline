@@ -77,4 +77,8 @@ jobs:
         run:  |
           docker build --build-arg REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL --tag=mp-frontend:latest .
           docker images
+          docker run --name mp-frontend -p 3000:3000 -d mp-frontend
+          curl http://localhost:3000
+          docker logs -f mp-frontend
+          docker stop
           
