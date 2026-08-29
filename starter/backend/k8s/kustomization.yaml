@@ -6,5 +6,5 @@ resources:
 namespace: default
 images:
 - name: backend
-  newName: ECR_REPO_URL
-  newTag: NEW_TAG_HERE
+  newName: 419656091143.dkr.ecr.us-east-1.amazonaws.com/movie-picture-pipeline-backend
+  newTag: 7818c2353ef9d3fb702b44ca6bf5af1369ce7f77
