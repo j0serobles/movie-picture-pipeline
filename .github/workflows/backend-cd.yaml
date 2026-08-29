@@ -124,5 +124,5 @@ jobs:
         run: |
           echo "${{ vars.KUBECONFIG }}" > kubeconfig.yaml
           kubectl version --client
-           kustomize build | kubectl apply --validate=false -f - --kubeconfig=kubeconfig.yaml
+           kustomize build | kubectl apply -f - --kubeconfig=kubeconfig.yaml
         working-directory: ./starter/backend/k8s
