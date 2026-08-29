@@ -10,6 +10,9 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'starter/backend/**'
+      - '.github/workflows/backend-cd.yaml'      
 
 defaults:
   run:
