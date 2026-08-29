@@ -122,7 +122,7 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          echo "${{ vars.KUBECONFIG }}" > kubeconfig.yaml
           kubectl version --client
            kustomize build | kubectl apply -f - --kubeconfig=kubeconfig.yaml
         working-directory: ./starter/backend/k8s
