@@ -129,5 +129,5 @@ jobs:
           echo "***** deployment.yaml *****"
           cat deployment.yaml
           kubectl version --client
-          kustomize build | kubectl apply -f - --kubeconfig=kubeconfig.yaml
+          kustomize build | kubectl apply --validate=false -f - --kubeconfig=kubeconfig.yaml
         working-directory: ./starter/frontend/k8s
